@@ -1,0 +1,31 @@
+version: "3.6"
+
+x-shared-env-files: &shared-env-files
+  - config.env
+  - secrets.env
+
+services:
+  fyurr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "app.py"]
+    container_name: fyyur
+    depends_on:
+      - fyurr-db
+    env_file: *shared-env-files
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    volumes:
+      - ./:/usr/src/app/
+  fyurr-db:
+    image: postgres
+    container_name: postgres-fyurr
+    env_file: *shared-env-files
+    hostname: ${POSTGRES_HOST}
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - ./data:/var/lib/postgresql/data
