@@ -10,10 +10,11 @@ import os
 
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import Form
-from forms import *
+from forms import ArtistForm, ShowForm, VenueForm
 
 from utils.helpers import AppHelper
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
@@ -27,6 +28,7 @@ app.config.from_object("config")
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 # ----------------------------------------------------------------------------#
@@ -34,7 +36,7 @@ db = SQLAlchemy(app)
 # ----------------------------------------------------------------------------#
 
 class Venue(db.Model):
-    __tablename__ = "Venue"
+    __tablename__ = "venue"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -49,7 +51,7 @@ class Venue(db.Model):
 
 
 class Artist(db.Model):
-    __tablename__ = "Artist"
+    __tablename__ = "artist"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
