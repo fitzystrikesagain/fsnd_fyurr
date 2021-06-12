@@ -248,6 +248,7 @@ class AppHelper:
         "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
     }
 
+
 class FormsHelper:
     """
     states and genres used by forms.py

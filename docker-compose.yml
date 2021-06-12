@@ -1,14 +1,14 @@
 version: "3.6"
 
 services:
-  fyurr:
+  fyyur:
     build:
       context: .
       dockerfile: Dockerfile
     command: ["python", "app.py"]
     container_name: fyyur
     depends_on:
-      - fyurr-db
+      - fyyur-db
     env_file:
       - .env
     ports:
@@ -16,9 +16,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/usr/src/app/
-  fyurr-db:
+  fyyur-db:
     image: postgres
-    container_name: postgres-fyurr
+    container_name: postgres-fyyur
     env_file:
       - .env
     hostname: ${POSTGRES_HOST}
