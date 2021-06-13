@@ -3,13 +3,15 @@
 # ----------------------------------------------------------------------------#
 
 import json
+import sys
+
 import dateutil.parser
 import logging
 from logging import Formatter, FileHandler
 import os
 
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_wtf import Form
@@ -17,7 +19,7 @@ from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
 from models import db
-from utils.helpers import ArtistHelper, ShowHelper, VenueHelper
+from utils.mock_data_helpers import ArtistHelper, ShowHelper, VenueHelper
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -65,6 +67,8 @@ def venues():
     # TODO: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
     data = VenueHelper.venues_data
+    if request.headers["api"]:
+        return jsonify(data)
     return render_template("pages/venues.html", areas=data)
 
 
@@ -81,6 +85,8 @@ def search_venues():
             "num_upcoming_shows": 0,
         }]
     }
+    if request.headers["api"]:
+        return jsonify(response)
     return render_template("pages/search_venues.html", results=response,
                            search_term=request.form.get("search_term", ''))
 
@@ -93,6 +99,8 @@ def show_venue(venue_id):
     data2 = VenueHelper.venues_id_data_2
     data3 = VenueHelper.venues_id_data_3
     data = list(filter(lambda d: d["id"] == venue_id, [data1, data2, data3]))[0]
+    if request.headers["api"]:
+        return jsonify(data)
     return render_template("pages/show_venue.html", venue=data)
 
 
