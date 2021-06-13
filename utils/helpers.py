@@ -1,4 +1,4 @@
-class AppHelper:
+class ArtistHelper:
     artists_data = [{
         "id": 4,
         "name": "Guns N Petals",
@@ -96,6 +96,8 @@ class AppHelper:
         "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
     }
 
+
+class ShowHelper:
     shows_data = [{
         "venue_id": 1,
         "venue_name": "The Musical Hop",
@@ -133,6 +135,7 @@ class AppHelper:
         "start_time": "2035-04-15T20:00:00.000Z"
     }]
 
+class VenueHelper:
     venues_data = [{
         "city": "San Francisco",
         "state": "CA",

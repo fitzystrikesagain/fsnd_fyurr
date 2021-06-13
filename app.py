@@ -17,7 +17,7 @@ from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
 from models import db
-from utils.helpers import AppHelper
+from utils.helpers import ArtistHelper, ShowHelper, VenueHelper
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -64,7 +64,7 @@ def index():
 def venues():
     # TODO: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = AppHelper.venues_data
+    data = VenueHelper.venues_data
     return render_template("pages/venues.html", areas=data)
 
 
@@ -89,9 +89,9 @@ def search_venues():
 def show_venue(venue_id):
     # shows the venue page with the given venue_id
     # TODO: replace with real venue data from the venues table, using venue_id
-    data1 = AppHelper.venues_id_data_1
-    data2 = AppHelper.venues_id_data_2
-    data3 = AppHelper.venues_id_data_3
+    data1 = VenueHelper.venues_id_data_1
+    data2 = VenueHelper.venues_id_data_2
+    data3 = VenueHelper.venues_id_data_3
     data = list(filter(lambda d: d["id"] == venue_id, [data1, data2, data3]))[0]
     return render_template("pages/show_venue.html", venue=data)
 
@@ -135,7 +135,7 @@ def delete_venue(venue_id):
 @app.route("/artists")
 def artists():
     # TODO: replace with real data returned from querying the database
-    data = AppHelper.artists_data
+    data = ArtistHelper.artists_data
     return render_template("pages/artists.html", artists=data)
 
 
@@ -160,9 +160,9 @@ def search_artists():
 def show_artist(artist_id):
     # shows the artist page with the given artist_id
     # TODO: replace with real artist data from the artist table, using artist_id
-    data1 = AppHelper.artists_id_data_1
-    data2 = AppHelper.artists_id_data_2
-    data3 = AppHelper.artists_id_data_3
+    data1 = ArtistHelper.artists_id_data_1
+    data2 = ArtistHelper.artists_id_data_2
+    data3 = ArtistHelper.artists_id_data_3
     data = list(filter(lambda d: d["id"] == artist_id, [data1, data2, data3]))[0]
     return render_template("pages/show_artist.html", artist=data)
 
@@ -173,7 +173,7 @@ def show_artist(artist_id):
 @app.route("/artists/<int:artist_id>/edit", methods=["GET"])
 def edit_artist(artist_id):
     form = ArtistForm()
-    artist = AppHelper.artist_id_edit_data
+    artist = ArtistHelper.artist_id_edit_data
     # TODO: populate form with fields from artist with ID <artist_id>
     return render_template("forms/edit_artist.html", form=form, artist=artist)
 
@@ -189,7 +189,7 @@ def edit_artist_submission(artist_id):
 @app.route("/venues/<int:venue_id>/edit", methods=["GET"])
 def edit_venue(venue_id):
     form = VenueForm()
-    venue = AppHelper.venues_id_edit_data
+    venue = VenueHelper.venues_id_edit_data
     # TODO: populate form with values from venue with ID <venue_id>
     return render_template("forms/edit_venue.html", form=form, venue=venue)
 
@@ -233,7 +233,7 @@ def shows():
     # displays list of shows at /shows
     # TODO: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = AppHelper.shows_data
+    data = ShowHelper.shows_data
     return render_template("pages/shows.html", shows=data)
 
 
