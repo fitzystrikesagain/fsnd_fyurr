@@ -18,7 +18,7 @@ from flask_wtf import Form
 from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
-from models import db
+from models import db, Venue
 from utils.mock_data_helpers import ArtistHelper, ShowHelper, VenueHelper
 
 # ----------------------------------------------------------------------------#
@@ -67,7 +67,7 @@ def venues():
     # TODO: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
     data = VenueHelper.venues_data
-    if request.headers["api"]:
+    if request.headers.get("api"):
         return jsonify(data)
     return render_template("pages/venues.html", areas=data)
 
@@ -85,7 +85,7 @@ def search_venues():
             "num_upcoming_shows": 0,
         }]
     }
-    if request.headers["api"]:
+    if request.headers.get("api"):
         return jsonify(response)
     return render_template("pages/search_venues.html", results=response,
                            search_term=request.form.get("search_term", ''))
@@ -94,12 +94,21 @@ def search_venues():
 @app.route("/venues/<int:venue_id>")
 def show_venue(venue_id):
     # shows the venue page with the given venue_id
-    # TODO: replace with real venue data from the venues table, using venue_id
-    data1 = VenueHelper.venues_id_data_1
-    data2 = VenueHelper.venues_id_data_2
-    data3 = VenueHelper.venues_id_data_3
-    data = list(filter(lambda d: d["id"] == venue_id, [data1, data2, data3]))[0]
-    if request.headers["api"]:
+    venue = Venue.query.get(venue_id)
+    data = {"id": venue.id,
+            'name': venue.name,
+            'genres': venue.genres,
+            'address': venue.address,
+            'city': venue.city,
+            'state': venue.state,
+            'phone': venue.phone,
+            'website': venue.website,
+            'facebook_link': venue.facebook_link,
+            'seeking_talent': venue.seeking_talent,
+            'seeking_description': venue.seeking_description,
+            'image_link': venue.image_link}
+
+    if request.headers.get("api"):
         return jsonify(data)
     return render_template("pages/show_venue.html", venue=data)
 
