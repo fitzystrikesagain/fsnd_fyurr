@@ -27,3 +27,4 @@ services:
     restart: unless-stopped
     volumes:
       - ./data:/var/lib/postgresql/data
+      - ./sql/venues.sql:/tmp/venues.sql
