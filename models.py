@@ -20,17 +20,18 @@ class Artist(db.Model):
     image_link = db.Column(db.String(512))
     website = db.Column(db.String(128))
     seeking_description = db.Column(db.String)
+    shows = db.relationship("Show", backref="artist", lazy=True)
 
     def __repr__(self):
         return f"<Artist id: {self.id}; name: {self.name}>"
 
 
-class Shows(db.Model):
+class Show(db.Model):
     __tablename__ = "shows"
 
     venue_id = db.Column(db.Integer, primary_key=True)
     venue_name = db.Column(db.String)
-    artist_id = db.Column(db.Integer)
+    artist_id = db.Column(db.Integer, db.ForeignKey("artists.id"), nullable=False)
     artist_name = db.Column(db.String)
     artist_image_link = db.Column(db.String)
     start_time = db.Column(db.String)
