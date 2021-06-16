@@ -206,8 +206,7 @@ def edit_artist(artist_id):
 
 @app.route("/artists/<int:artist_id>/edit", methods=["POST"])
 def edit_artist_submission(artist_id):
-    # TODO: take values from the form submitted, and update existing
-    # artist record with ID <artist_id> using the new attributes
+    # TODO: take values from the form submitted, and update existing artist record with ID <artist_id> using the new attributes
 
     return redirect(url_for("show_artist", artist_id=artist_id))
 
@@ -215,9 +214,20 @@ def edit_artist_submission(artist_id):
 @app.route("/venues/<int:venue_id>/edit", methods=["GET"])
 def edit_venue(venue_id):
     form = VenueForm()
-    venue = VenueHelper.venues_id_edit_data
-    # TODO: populate form with values from venue with ID <venue_id>
-    return render_template("forms/edit_venue.html", form=form, venue=venue)
+    venue = Venue.query.get(venue_id)
+    data = {"id": venue.id,
+            "name": venue.name,
+            "genres": venue.genres,
+            "address": venue.address,
+            "city": venue.city,
+            "state": venue.state,
+            "phone": venue.phone,
+            "website": venue.website,
+            "facebook_link": venue.facebook_link,
+            "seeking_talent": venue.seeking_talent,
+            "seeking_description": venue.seeking_description,
+            "image_link": venue.image_link}
+    return render_template("forms/edit_venue.html", form=form, venue=data)
 
 
 @app.route("/venues/<int:venue_id>/edit", methods=["POST"])
