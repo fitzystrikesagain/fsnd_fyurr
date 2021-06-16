@@ -175,11 +175,20 @@ def search_artists():
 @app.route("/artists/<int:artist_id>")
 def show_artist(artist_id):
     # shows the artist page with the given artist_id
-    # TODO: replace with real artist data from the artist table, using artist_id
-    data1 = ArtistHelper.artists_id_data_1
-    data2 = ArtistHelper.artists_id_data_2
-    data3 = ArtistHelper.artists_id_data_3
-    data = list(filter(lambda d: d["id"] == artist_id, [data1, data2, data3]))[0]
+    # TODO: add past and upcoming shows
+    artist = Artist.query.get(artist_id)
+    data = {"id": artist.id,
+            "name": artist.name,
+            "genres": artist.genres,
+            "city": artist.city,
+            "state": artist.state,
+            "phone": artist.phone,
+            "website": artist.website,
+            "facebook_link": artist.facebook_link,
+            "seeking_venue": artist.seeking_venue,
+            "seeking_description": artist.seeking_description,
+            "image_link": artist.image_link}
+
     return render_template("pages/show_artist.html", artist=data)
 
 
@@ -189,9 +198,10 @@ def show_artist(artist_id):
 @app.route("/artists/<int:artist_id>/edit", methods=["GET"])
 def edit_artist(artist_id):
     form = ArtistForm()
-    artist = ArtistHelper.artist_id_edit_data
-    # TODO: populate form with fields from artist with ID <artist_id>
-    return render_template("forms/edit_artist.html", form=form, artist=artist)
+    artist = Artist.query.get(artist_id)
+    data = {"id": artist.id,
+            "name": artist.name}
+    return render_template("forms/edit_artist.html", form=form, artist=data)
 
 
 @app.route("/artists/<int:artist_id>/edit", methods=["POST"])
