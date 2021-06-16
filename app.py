@@ -18,7 +18,7 @@ from flask_wtf import Form
 from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
-from models import db, Venue
+from models import db, Venue, Artist
 from utils.mock_data_helpers import ArtistHelper, ShowHelper, VenueHelper
 
 # ----------------------------------------------------------------------------#
@@ -151,8 +151,7 @@ def delete_venue(venue_id):
 # ----------------------------------------------------------------------------#
 @app.route("/artists")
 def artists():
-    # TODO: replace with real data returned from querying the database
-    data = ArtistHelper.artists_data
+    data = [{"id": artist.id, "name": artist.name} for artist in Artist.query.all()]
     return render_template("pages/artists.html", artists=data)
 
 
