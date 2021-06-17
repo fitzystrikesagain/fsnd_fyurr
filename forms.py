@@ -6,6 +6,42 @@ from wtforms.validators import DataRequired, AnyOf, URL
 from utils.helpers import FormsHelper
 
 
+class ArtistForm(FlaskForm):
+    name = StringField(
+        'name', validators=[DataRequired()]
+    )
+    city = StringField(
+        'city', validators=[DataRequired()]
+    )
+    state = SelectField(
+        'state', validators=[DataRequired()],
+        choices=FormsHelper.states_list
+    )
+    phone = StringField(
+        'phone'
+    )
+    image_link = StringField(
+        'image_link'
+    )
+    genres = SelectMultipleField(
+        'genres', validators=[DataRequired()],
+        choices=FormsHelper.genres_list
+    )
+    facebook_link = StringField(
+        'facebook_link', validators=[URL()]
+    )
+
+    website_link = StringField(
+        'website_link'
+    )
+
+    seeking_venue = BooleanField('seeking_venue')
+
+    seeking_description = StringField(
+        'seeking_description'
+    )
+
+
 class ShowForm(FlaskForm):
     artist_id = StringField(
         'artist_id'
@@ -52,42 +88,6 @@ class VenueForm(FlaskForm):
     )
 
     seeking_talent = BooleanField('seeking_talent')
-
-    seeking_description = StringField(
-        'seeking_description'
-    )
-
-
-class ArtistForm(FlaskForm):
-    name = StringField(
-        'name', validators=[DataRequired()]
-    )
-    city = StringField(
-        'city', validators=[DataRequired()]
-    )
-    state = SelectField(
-        'state', validators=[DataRequired()],
-        choices=FormsHelper.states_list
-    )
-    phone = StringField(
-        'phone'
-    )
-    image_link = StringField(
-        'image_link'
-    )
-    genres = SelectMultipleField(
-        'genres', validators=[DataRequired()],
-        choices=FormsHelper.genres_list
-    )
-    facebook_link = StringField(
-        'facebook_link', validators=[URL()]
-    )
-
-    website_link = StringField(
-        'website_link'
-    )
-
-    seeking_venue = BooleanField('seeking_venue')
 
     seeking_description = StringField(
         'seeking_description'
