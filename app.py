@@ -4,6 +4,7 @@
 
 import json
 import sys
+from datetime import datetime
 
 import dateutil.parser
 import logging
@@ -19,7 +20,7 @@ from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
 from models import db, Venue, Artist, Show
-from utils.mock_data_helpers import ArtistHelper, ShowHelper, VenueHelper
+from utils.mock_data_helpers import AppHelper
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -31,6 +32,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 migrate = Migrate(app, db)
+
+app_helper = AppHelper()
 
 
 # ----------------------------------------------------------------------------#
@@ -65,6 +68,7 @@ def index():
 @app.route("/venues")
 def venues():
     # TODO: add number of upcoming shows
+    upcoming_shows = app_helper.get_shows("future")
     data = [
         {
             "city": venue.city,
@@ -73,10 +77,12 @@ def venues():
                 {
                     "id": venue.id,
                     "name": venue.name,
-                    "num_upcoming_shows": 0
+                    "num_upcoming_shows": [show.venue_id for show in upcoming_shows].count(venue.id)
+                    # venues is a list of dicts that iterates over each venue in a city
                 } for venue in Venue.query.filter(Venue.city == venue.city)
             ]
         }
+        # data is a list of dicts that iterates over every venue in every distinct city
         for venue in Venue.query.distinct(Venue.city).order_by(Venue.city).all()
     ]
     if request.headers.get("api"):
@@ -150,9 +156,7 @@ def create_venue_submission():
 
 @app.route("/venues/<venue_id>", methods=["DELETE"])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
+    # TODO: Complete this endpoint for taking a venue_id, and using SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
     # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
     # clicking that button delete it from the db then redirect the user to the homepage
     return None
@@ -288,7 +292,7 @@ def shows():
          "artist_name": show.artists.name,
          "artist_image_link": show.artists.image_link,
          "start_time": str(show.start_time)}
-        for show in Show.query.join(Venue).join(Artist).all()
+        for show in Show.query.all()
     ]
     return render_template("pages/shows.html", shows=shows_data)
 

@@ -1,3 +1,24 @@
+from models import *
+
+
+class AppHelper:
+    """
+    Assorted helper methods for the Fyyur app
+    """
+    def get_shows(self, interval="all"):
+        """
+        Get a list of all Show objects
+        :param interval: (optional) get only past or future shows
+        :return: list of Show objects
+        """
+        all_shows = Show.query.all()
+        if interval == "past":
+            return filter(lambda x: x.start_time < datetime.now(), all_shows)
+        elif interval == "future":
+            return filter(lambda x: x.start_time > datetime.now(), all_shows)
+        return all_shows
+
+
 class ArtistHelper:
     artists_data = [{
         "id": 4,
