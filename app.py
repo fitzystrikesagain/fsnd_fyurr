@@ -6,7 +6,7 @@ import logging
 from logging import Formatter, FileHandler
 import os
 
-import babel
+from babel import dates
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort
 from flask_migrate import Migrate
 from flask_moment import Moment
@@ -20,12 +20,12 @@ from utils.mock_data_helpers import AppHelper
 # App Config.
 # ----------------------------------------------------------------------------#
 app = Flask(__name__, template_folder="./templates")
-moment = Moment(app)
 app.config.from_object("config")
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 migrate = Migrate(app, db)
+moment = Moment(app)
 app_helper = AppHelper()
 
 
@@ -33,13 +33,13 @@ app_helper = AppHelper()
 # Filters.
 # ----------------------------------------------------------------------------#
 
-def format_datetime(value, format="medium"):
+def format_datetime(value, date_format="medium"):
     date = dateutil.parser.parse(value)
-    if format == "full":
-        format = "EEEE MMMM, d, y 'at' h:mma"
-    elif format == "medium":
-        format = "EE MM, dd, y h:mma"
-    return babel.dates.format_datetime(date, format, locale="en")
+    if date_format == "full":
+        date_format = "EEEE MMMM, d, y 'at' h:mma"
+    elif date_format == "medium":
+        date_format = "EE MM, dd, y h:mma"
+    return dates.format_datetime(date, date_format, locale="en")
 
 
 app.jinja_env.filters["datetime"] = format_datetime
@@ -182,7 +182,7 @@ def create_venue_submission():
         db.session.rollback()
     finally:
         db.session.close()
-    return render_template("pages/home.html")
+    return redirect(url_for("index"))
 
 
 @app.route("/venues/<venue_id>", methods=["DELETE"])
@@ -317,12 +317,12 @@ def create_artist_form():
 @app.route("/artists/create", methods=["POST"])
 def create_artist_submission():
     # called upon submitting the new artist listing form
-    # TODO: [insert] insert form data as a new Venue record in the db, instead
-    # TODO: [insert] modify data to be the data object returned from db insertion
+    # TODO: [insert] insert form data as a new Artist record in the db, instead. \
+    #  modify data to be the data object returned from db insertion \
+    #  [insert] [error] on unsuccessful db insert, flash an error instead.
 
     # on successful db insert, flash success
     flash(f"Artist {request.form['name']} was successfully listed!")
-    # TODO: [insert] [error] on unsuccessful db insert, flash an error instead.
     # e.g., flash("An error occurred. Artist " + data.name + " could not be listed.")
     return render_template("pages/home.html")
 
@@ -368,11 +368,13 @@ def create_show_submission():
 
 @app.errorhandler(404)
 def not_found_error(error):
+    logging.error(error)
     return render_template("errors/404.html"), 404
 
 
 @app.errorhandler(500)
 def server_error(error):
+    logging.error(error)
     return render_template("errors/500.html"), 500
 
 
