@@ -160,35 +160,8 @@ def create_venue_form():
 
 @app.route("/venues/create", methods=["POST"])
 def create_venue_submission():
-    form = VenueForm(request.form)
     venue = Venue()
-    venues_max_id = AppHelper.max_value(db, "venues")
-    if venues_max_id:
-        venue.id = venues_max_id + 1
-    data = {"name": form.name.data,
-            "genres": form.genres.data,
-            "address": form.address.data,
-            "city": form.city.data,
-            "state": form.state.data,
-            "phone": form.phone.data,
-            "website": form.website_link.data,
-            "facebook_link": form.facebook_link.data,
-            "seeking_talent": form.seeking_talent.data,
-            "seeking_description": form.seeking_description.data,
-            "image_link": form.image_link.data}
-
-    for key, value in data.items():
-        setattr(venue, key, value)
-    try:
-        db.session.add(venue)
-        db.session.commit()
-        flash(f"Venue {request.form['name']} was successfully listed!")
-    except Exception as e:
-        flash(f"An error occurred. Venue {venue.name} could not be listed.")
-        logging.error(e)
-        db.session.rollback()
-    finally:
-        db.session.close()
+    app_helper.handle_submission(venue, "insert")
     return redirect(url_for("index"))
 
 
@@ -329,35 +302,8 @@ def create_artist_form():
 
 @app.route("/artists/create", methods=["POST"])
 def create_artist_submission():
-    form = ArtistForm(request.form)
     artist = Artist()
-    artists_max_id = AppHelper.max_value(db, "artists")
-    if artists_max_id:
-        artist.id = artists_max_id + 1
-    data = {
-        "name": form.name.data,
-        "genres": form.genres.data,
-        "city": form.city.data,
-        "state": form.state.data,
-        "phone": form.phone.data,
-        "facebook_link": form.facebook_link.data,
-        "seeking_venue": form.seeking_venue.data,
-        "image_link": form.image_link.data,
-        "website": form.website_link.data,
-        "seeking_description": form.seeking_description.data
-    }
-    for key, value in data.items():
-        setattr(artist, key, value)
-    try:
-        db.session.add(artist)
-        db.session.commit()
-        flash(f"Artist {data.get('name')} was successfully listed!")
-    except Exception as e:
-        flash(f"An error occurred. Artist {artist.name} could not be listed.")
-        print(e, file=sys.stderr)
-        db.session.rollback()
-    finally:
-        db.session.close()
+    app_helper.handle_submission(artist, "insert")
     return redirect(url_for("index"))
 
 
@@ -389,29 +335,8 @@ def create_shows():
 
 @app.route("/shows/create", methods=["POST"])
 def create_show_submission():
-    form = ShowForm(request.form)
     show = Show()
-    shows_max_id = AppHelper.max_value(db, "shows")
-    if shows_max_id:
-        show.id = shows_max_id + 1
-    data = {
-        "venue_id": form.venue_id.data,
-        "artist_id": form.artist_id.data,
-        "start_time": form.start_time.data
-    }
-    artist_name = Artist.query.get(data["artist_id"]).name
-    for key, value in data.items():
-        setattr(show, key, value)
-    try:
-        db.session.add(show)
-        db.session.commit()
-        flash(f"Show for {artist_name} at {data['start_time']} was successfully listed!")
-    except Exception as e:
-        flash(f"An error occurred. Show for {artist_name} could not be listed.")
-        logging.error(e)
-        db.session.rollback()
-    finally:
-        db.session.close()
+    app_helper.handle_submission(show, "insert")
     return redirect(url_for("index"))
 
 
