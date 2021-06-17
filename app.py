@@ -158,6 +158,9 @@ def create_venue_form():
 def create_venue_submission():
     form = VenueForm(request.form)
     venue = Venue()
+    venues_max_id = AppHelper.max_value(db, "venues")
+    if venues_max_id:
+        venue.id = venues_max_id + 1
     data = {"name": form.name.data,
             "genres": form.genres.data,
             "address": form.address.data,

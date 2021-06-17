@@ -1,3 +1,5 @@
+from sqlalchemy import func
+
 from models import *
 
 
@@ -5,6 +7,7 @@ class AppHelper:
     """
     Assorted helper methods for the Fyyur app
     """
+
     def get_shows(self, interval="all"):
         """
         Get a list of all Show objects
@@ -52,6 +55,16 @@ class AppHelper:
             "venues": [obj.id for obj in Venue.query.all()],
         }
         return entity_id in valid_entities[entity]
+
+    @staticmethod
+    def max_value(db, entity):
+        max_values = {
+            "artists": db.session.query(func.max(Artist.id)).scalar(),
+            "shows": db.session.query(func.max(Show.id)).scalar(),
+            "venues": db.session.query(func.max(Venue.id)).scalar()
+        }
+        return max_values[entity]
+        pass
 
     @staticmethod
     def search(entity, pattern):
