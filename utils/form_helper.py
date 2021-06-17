@@ -1,4 +1,4 @@
-class FormsHelper:
+class FormHelper:
     """
     states and genres used by forms.py
     """

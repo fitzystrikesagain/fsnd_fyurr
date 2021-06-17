@@ -3,7 +3,7 @@ import sys
 from flask import request, flash
 from sqlalchemy import func
 
-from models import *
+from models import Artist, Show, Venue, db
 from forms import ArtistForm, ShowForm, VenueForm
 
 
@@ -78,6 +78,12 @@ class AppHelper:
         return results[entity]
 
     def handle_submission(self, obj, operation):
+        """
+        Custom handler for submissions. Parses form data to either create new or update existing entities
+        :param obj: an instance of either Artist, Show, or Venue
+        :param operation: CRUD operation, either insert or update
+        :return: None
+        """
         cls_name = obj.__class__.__name__
         entity = obj.__tablename__
         entity_form = {
@@ -134,4 +140,3 @@ class AppHelper:
             db.session.rollback()
         finally:
             db.session.close()
-        pass

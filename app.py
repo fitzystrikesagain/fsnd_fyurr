@@ -18,7 +18,7 @@ from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
 from models import db, Venue, Artist, Show
-from utils.helpers import AppHelper
+from utils.app_helper import AppHelper
 
 # ----------------------------------------------------------------------------#
 # App Config.
