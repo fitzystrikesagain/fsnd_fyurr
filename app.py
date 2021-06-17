@@ -67,7 +67,6 @@ def index():
 
 @app.route("/venues")
 def venues():
-    # TODO: add number of upcoming shows
     upcoming_shows = app_helper.get_shows("future")
     data = [
         {
