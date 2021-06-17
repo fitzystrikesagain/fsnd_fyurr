@@ -217,7 +217,23 @@ def search_artists():
 @app.route("/artists/<int:artist_id>")
 def show_artist(artist_id):
     # shows the artist page with the given artist_id
-    # TODO: add past and upcoming shows
+    artist_past_shows = app_helper.get_shows_for_artist(artist_id, "past")
+    artist_upcoming_shows = app_helper.get_shows_for_artist(artist_id, "future")
+
+    past_shows = [{
+        "venue_id": show.venue_id,
+        "venue_name": show.venues.name,
+        "venue_image_link": show.venues.image_link,
+        "start_time": str(show.start_time),
+    } for show in artist_past_shows]
+
+    upcoming_shows = [{
+        "venue_id": show.venue_id,
+        "venue_name": show.venues.name,
+        "venue_image_link": show.venues.image_link,
+        "start_time": str(show.start_time),
+    } for show in artist_upcoming_shows]
+
     try:
         artist = Artist.query.get(artist_id)
         data = {"id": artist.id,
@@ -230,7 +246,10 @@ def show_artist(artist_id):
                 "facebook_link": artist.facebook_link,
                 "seeking_venue": artist.seeking_venue,
                 "seeking_description": artist.seeking_description,
-                "image_link": artist.image_link}
+                "image_link": artist.image_link,
+                "past_shows": past_shows,
+                "upcoming_shows": upcoming_shows,
+                }
         return render_template("pages/show_artist.html", artist=data)
     except AttributeError as e:
         return not_found_error(e)

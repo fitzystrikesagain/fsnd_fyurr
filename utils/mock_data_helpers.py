@@ -21,11 +21,8 @@ class AppHelper:
             return filter(lambda x: x.start_time > datetime.now(), all_shows)
         return all_shows
 
-    def get_upcoming_shows_for_venue(self, venue_id):
-        return filter(lambda x: x.venues.id == venue_id, self.get_shows("future"))
-
-    def get_past_shows_for_venue(self, venue_id):
-        shows = filter(lambda x: x.venues.id == venue_id, self.get_shows("past"))
+    def get_shows_for_artist(self, artist_id, interval="all"):
+        shows = filter(lambda x: x.artists.id == artist_id, self.get_shows(interval))
         return shows
 
     def get_shows_for_venue(self, venue_id, interval="all"):
