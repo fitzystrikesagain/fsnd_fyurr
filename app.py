@@ -111,7 +111,27 @@ def search_venues():
 @app.route("/venues/<int:venue_id>")
 def show_venue(venue_id):
     # shows the venue page with the given venue_id
+    # todo: fix AttributeError: 'NoneType' object has no attribute 'id' for non-existeng venue_id
     venue = Venue.query.get(venue_id)
+    past_venue_shows = app_helper.get_shows_for_venue(venue_id, "past")
+    upcoming_venue_shows = app_helper.get_shows_for_venue(venue_id, "future")
+
+    past_shows = [{
+        "artist_id": show.artist_id,
+        "artist_name": show.artists.name,
+        "artist_image_link": show.artists.image_link,
+        "start_time": str(show.start_time)
+    } for show in past_venue_shows]
+
+    upcoming_shows = [{
+        "artist_id": show.artist_id,
+        "artist_name": show.artists.name,
+        "artist_image_link": show.artists.image_link,
+        "start_time": str(show.start_time)
+    } for show in upcoming_venue_shows]
+
+    print(past_shows, file=sys.stderr)
+    print(upcoming_shows, file=sys.stderr)
     data = {"id": venue.id,
             'name': venue.name,
             'genres': venue.genres,
@@ -123,7 +143,12 @@ def show_venue(venue_id):
             'facebook_link': venue.facebook_link,
             'seeking_talent': venue.seeking_talent,
             'seeking_description': venue.seeking_description,
-            'image_link': venue.image_link}
+            'image_link': venue.image_link,
+            'past_shows': past_shows,
+            'upcoming_shows': upcoming_shows,
+            "past_shows_count": len(past_shows),
+            "upcoming_shows_count": len(upcoming_shows),
+            }
 
     if request.headers.get("api"):
         return jsonify(data)

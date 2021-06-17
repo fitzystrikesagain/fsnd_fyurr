@@ -5,6 +5,7 @@ class AppHelper:
     """
     Assorted helper methods for the Fyyur app
     """
+
     def get_shows(self, interval="all"):
         """
         Get a list of all Show objects
@@ -17,6 +18,18 @@ class AppHelper:
         elif interval == "future":
             return filter(lambda x: x.start_time > datetime.now(), all_shows)
         return all_shows
+
+    def get_upcoming_shows_for_venue(self, venue_id):
+        shows = filter(lambda x: x.venues.id == venue_id, self.get_shows("future"))
+        return list(shows)
+
+    def get_past_shows_for_venue(self, venue_id):
+        shows = filter(lambda x: x.venues.id == venue_id, self.get_shows("past"))
+        return list(shows)
+
+    def get_shows_for_venue(self, venue_id, interval="all"):
+        shows = filter(lambda x: x.venues.id == venue_id, self.get_shows(interval))
+        return list(shows)
 
 
 class ArtistHelper:
