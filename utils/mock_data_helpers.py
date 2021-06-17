@@ -5,6 +5,8 @@ class AppHelper:
     """
     Assorted helper methods for the Fyyur app
     """
+    def get_artists(self):
+        return Artist.query.all()
 
     def get_shows(self, interval="all"):
         """
@@ -20,16 +22,30 @@ class AppHelper:
         return all_shows
 
     def get_upcoming_shows_for_venue(self, venue_id):
-        shows = filter(lambda x: x.venues.id == venue_id, self.get_shows("future"))
-        return list(shows)
+        return filter(lambda x: x.venues.id == venue_id, self.get_shows("future"))
 
     def get_past_shows_for_venue(self, venue_id):
         shows = filter(lambda x: x.venues.id == venue_id, self.get_shows("past"))
-        return list(shows)
+        return shows
 
     def get_shows_for_venue(self, venue_id, interval="all"):
         shows = filter(lambda x: x.venues.id == venue_id, self.get_shows(interval))
         return list(shows)
+
+    def validate_entity(self, entity, entity_id):
+        """
+        Ensures that valid ids are passed in for Artist, Show, and Venue. Checks to see if `entity_id` exists
+        in valid_entities[entity]:
+        :param entity: one of Artist, Show, Venue
+        :param entity_id: the id of the entity, i.e. artist_id 1
+        :return: boolean
+        """
+        valid_entities = {
+            "artists": [obj.id for obj in Artist.query.all()],
+            "shows": [obj.id for obj in Show.query.all()],
+            "venues": [obj.id for obj in Venue.query.all()],
+        }
+        return entity_id in valid_entities[entity]
 
 
 class ArtistHelper:

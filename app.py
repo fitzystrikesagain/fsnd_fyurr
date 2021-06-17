@@ -12,7 +12,7 @@ from logging import Formatter, FileHandler
 import os
 
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, abort
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_wtf import Form
@@ -111,7 +111,9 @@ def search_venues():
 @app.route("/venues/<int:venue_id>")
 def show_venue(venue_id):
     # shows the venue page with the given venue_id
-    # todo: fix AttributeError: 'NoneType' object has no attribute 'id' for non-existeng venue_id
+    if not app_helper.validate_entity("venues", venue_id):
+        abort(404)
+
     venue = Venue.query.get(venue_id)
     past_venue_shows = app_helper.get_shows_for_venue(venue_id, "past")
     upcoming_venue_shows = app_helper.get_shows_for_venue(venue_id, "future")
