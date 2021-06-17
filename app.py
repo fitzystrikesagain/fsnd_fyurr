@@ -1,15 +1,19 @@
 # ----------------------------------------------------------------------------#
 # Imports
 # ----------------------------------------------------------------------------#
+import sys
+import time
+
 import dateutil.parser
 import logging
 from logging import Formatter, FileHandler
 import os
 
 from babel import dates
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort, Response
 from flask_migrate import Migrate
 from flask_moment import Moment
+
 from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
@@ -190,10 +194,16 @@ def create_venue_submission():
 
 @app.route("/venues/<venue_id>", methods=["DELETE"])
 def delete_venue(venue_id):
-    # TODO: [delete] Complete this endpoint for taking a venue_id, and using SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
-    return None
+    venue = Venue.query.get(venue_id)
+    try:
+        db.session.delete(venue)
+        db.session.commit()
+    except Exception as e:
+        logging.error(e)
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for("index", msg="Testing"))
 
 
 # ----------------------------------------------------------------------------#
