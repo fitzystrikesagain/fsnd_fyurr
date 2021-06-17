@@ -18,7 +18,7 @@ from flask_wtf import Form
 from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
-from models import db, Venue, Artist
+from models import db, Venue, Artist, Show
 from utils.mock_data_helpers import ArtistHelper, ShowHelper, VenueHelper
 
 # ----------------------------------------------------------------------------#
@@ -64,9 +64,21 @@ def index():
 
 @app.route("/venues")
 def venues():
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = VenueHelper.venues_data
+    # TODO: add number of upcoming shows
+    data = [
+        {
+            "city": venue.city,
+            "state": venue.state,
+            "venues": [
+                {
+                    "id": venue.id,
+                    "name": venue.name,
+                    "num_upcoming_shows": 0
+                } for venue in Venue.query.filter(Venue.city == venue.city)
+            ]
+        }
+        for venue in Venue.query.distinct(Venue.city).order_by(Venue.city).all()
+    ]
     if request.headers.get("api"):
         return jsonify(data)
     return render_template("pages/venues.html", areas=data)
@@ -176,20 +188,22 @@ def search_artists():
 def show_artist(artist_id):
     # shows the artist page with the given artist_id
     # TODO: add past and upcoming shows
-    artist = Artist.query.get(artist_id)
-    data = {"id": artist.id,
-            "name": artist.name,
-            "genres": artist.genres,
-            "city": artist.city,
-            "state": artist.state,
-            "phone": artist.phone,
-            "website": artist.website,
-            "facebook_link": artist.facebook_link,
-            "seeking_venue": artist.seeking_venue,
-            "seeking_description": artist.seeking_description,
-            "image_link": artist.image_link}
-
-    return render_template("pages/show_artist.html", artist=data)
+    try:
+        artist = Artist.query.get(artist_id)
+        data = {"id": artist.id,
+                "name": artist.name,
+                "genres": artist.genres,
+                "city": artist.city,
+                "state": artist.state,
+                "phone": artist.phone,
+                "website": artist.website,
+                "facebook_link": artist.facebook_link,
+                "seeking_venue": artist.seeking_venue,
+                "seeking_description": artist.seeking_description,
+                "image_link": artist.image_link}
+        return render_template("pages/show_artist.html", artist=data)
+    except AttributeError as e:
+        return not_found_error(e)
 
 
 # ----------------------------------------------------------------------------#
@@ -267,10 +281,16 @@ def create_artist_submission():
 @app.route("/shows")
 def shows():
     # displays list of shows at /shows
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = ShowHelper.shows_data
-    return render_template("pages/shows.html", shows=data)
+    shows_data = [
+        {"venue_id": show.venue_id,
+         "venue_name": show.venues.name,
+         "artist_id": show.artists.id,
+         "artist_name": show.artists.name,
+         "artist_image_link": show.artists.image_link,
+         "start_time": str(show.start_time)}
+        for show in Show.query.join(Venue).join(Artist).all()
+    ]
+    return render_template("pages/shows.html", shows=shows_data)
 
 
 @app.route("/shows/create")

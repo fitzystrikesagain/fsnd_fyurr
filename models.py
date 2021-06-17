@@ -37,7 +37,7 @@ class Show(db.Model):
     start_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"<Show id: {self.id}; name: {self.name}>"
+        return f"<Show id: {self.id}; start_time: {self.start_time}>"
 
 
 class Venue(db.Model):
