@@ -91,21 +91,21 @@ def venues():
 
 @app.route("/venues/search", methods=["POST"])
 def search_venues():
-    # TODO: [search] implement search on artists with partial string search. Ensure it is case-insensitive.
-    # seach for Hop should return "The Musical Hop".
-    # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+    pattern = request.form.get("search_term", default="")
+    results = app_helper.search(entity="venues", pattern=pattern)
+    upcoming_shows = app_helper.get_shows_for_venue(1, "future")
+
     response = {
-        "count": 1,
+        "count": len(results),
         "data": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
+            "id": venue.id,
+            "name": venue.name,
+            "num_upcoming_shows": len(upcoming_shows)
+        } for venue in results]
     }
     if request.headers.get("api"):
         return jsonify(response)
-    return render_template("pages/search_venues.html", results=response,
-                           search_term=request.form.get("search_term", ''))
+    return render_template("pages/search_venues.html", results=response, search_term=pattern)
 
 
 @app.route("/venues/<int:venue_id>")
@@ -202,6 +202,7 @@ def search_artists():
     # TODO: [search] implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
     # search for "band" should return "The Wild Sax Band".
+    results = app_helper.search("artists", request.form.get("search_term"))
     response = {
         "count": 1,
         "data": [{

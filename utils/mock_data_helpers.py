@@ -5,9 +5,6 @@ class AppHelper:
     """
     Assorted helper methods for the Fyyur app
     """
-    def get_artists(self):
-        return Artist.query.all()
-
     def get_shows(self, interval="all"):
         """
         Get a list of all Show objects
@@ -22,10 +19,22 @@ class AppHelper:
         return all_shows
 
     def get_shows_for_artist(self, artist_id, interval="all"):
+        """
+        Returns a list of Show objects for a given Artist
+        :param artist_id: the id of the artist
+        :param interval: past, future, or all
+        :return:
+        """
         shows = filter(lambda x: x.artists.id == artist_id, self.get_shows(interval))
         return shows
 
     def get_shows_for_venue(self, venue_id, interval="all"):
+        """
+        Returns a list of Show objects for a given venue
+        :param venue_id: the id of the venue
+        :param interval: past, future, or all
+        :return:
+        """
         shows = filter(lambda x: x.venues.id == venue_id, self.get_shows(interval))
         return list(shows)
 
@@ -43,6 +52,14 @@ class AppHelper:
             "venues": [obj.id for obj in Venue.query.all()],
         }
         return entity_id in valid_entities[entity]
+
+    @staticmethod
+    def search(entity, pattern):
+        results = {
+            "artists": Artist.query.filter(Artist.name.ilike(f"%{pattern}%")).all(),
+            "venues": Venue.query.filter(Venue.name.ilike(f"%{pattern}%")).all(),
+        }
+        return results[entity]
 
 
 class ArtistHelper:
