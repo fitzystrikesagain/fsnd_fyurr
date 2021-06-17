@@ -329,15 +329,36 @@ def create_artist_form():
 
 @app.route("/artists/create", methods=["POST"])
 def create_artist_submission():
-    # called upon submitting the new artist listing form
-    # TODO: [insert] insert form data as a new Artist record in the db, instead. \
-    #  modify data to be the data object returned from db insertion \
-    #  [insert] [error] on unsuccessful db insert, flash an error instead.
-
-    # on successful db insert, flash success
-    flash(f"Artist {request.form['name']} was successfully listed!")
-    # e.g., flash("An error occurred. Artist " + data.name + " could not be listed.")
-    return render_template("pages/home.html")
+    form = ArtistForm(request.form)
+    artist = Artist()
+    artists_max_id = AppHelper.max_value(db, "artists")
+    if artists_max_id:
+        artist.id = artists_max_id + 1
+    data = {
+        "name": form.name.data,
+        "genres": form.genres.data,
+        "city": form.city.data,
+        "state": form.state.data,
+        "phone": form.phone.data,
+        "facebook_link": form.facebook_link.data,
+        "seeking_venue": form.seeking_venue.data,
+        "image_link": form.image_link.data,
+        "website": form.website_link.data,
+        "seeking_description": form.seeking_description.data
+    }
+    for key, value in data.items():
+        setattr(artist, key, value)
+    try:
+        db.session.add(artist)
+        db.session.commit()
+        flash(f"Artist {data.get('name')} was successfully listed!")
+    except Exception as e:
+        flash(f"An error occurred. Artist {artist.name} could not be listed.")
+        print(e, file=sys.stderr)
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for("index"))
 
 
 # ----------------------------------------------------------------------------#
