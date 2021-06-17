@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
 from wtforms.validators import DataRequired, AnyOf, URL
 
-from utils.helpers import FormsHelper
+from utils.form_helper import FormsHelper
 
 
 class ArtistForm(FlaskForm):
