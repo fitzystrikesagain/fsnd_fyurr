@@ -93,14 +93,13 @@ def venues():
 def search_venues():
     pattern = request.form.get("search_term", default="")
     results = app_helper.search(entity="venues", pattern=pattern)
-    upcoming_shows = app_helper.get_shows_for_venue(1, "future")
 
     response = {
         "count": len(results),
         "data": [{
             "id": venue.id,
             "name": venue.name,
-            "num_upcoming_shows": len(upcoming_shows)
+            "num_upcoming_shows": len(app_helper.get_shows_for_venue(venue.id, "future"))
         } for venue in results]
     }
     if request.headers.get("api"):
@@ -199,20 +198,18 @@ def artists():
 
 @app.route("/artists/search", methods=["POST"])
 def search_artists():
-    # TODO: [search] implement search on artists with partial string search. Ensure it is case-insensitive.
-    # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
-    # search for "band" should return "The Wild Sax Band".
-    results = app_helper.search("artists", request.form.get("search_term"))
+    pattern = request.form.get("search_term", default="")
+    results = app_helper.search(entity="artists", pattern=pattern)
+
     response = {
-        "count": 1,
+        "count": len(results),
         "data": [{
-            "id": 4,
-            "name": "Guns N Petals",
-            "num_upcoming_shows": 0,
-        }]
+            "id": artist.id,
+            "name": artist.name,
+            "num_upcoming_shows": app_helper.get_shows_for_artist(artist.id, "future"),
+        } for artist in results]
     }
-    return render_template("pages/search_artists.html", results=response,
-                           search_term=request.form.get("search_term", ""))
+    return render_template("pages/search_artists.html", results=response, search_term=pattern)
 
 
 @app.route("/artists/<int:artist_id>")
