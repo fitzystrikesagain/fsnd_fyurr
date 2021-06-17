@@ -2,20 +2,15 @@
 # Imports
 # ----------------------------------------------------------------------------#
 
-import json
-import sys
-from datetime import datetime
-
 import dateutil.parser
 import logging
 from logging import Formatter, FileHandler
 import os
 
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, abort
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort
 from flask_migrate import Migrate
 from flask_moment import Moment
-from flask_wtf import Form
 from forms import ArtistForm, ShowForm, VenueForm
 
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
@@ -32,7 +27,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 migrate = Migrate(app, db)
-
 app_helper = AppHelper()
 
 
@@ -68,19 +62,17 @@ def index():
 @app.route("/venues")
 def venues():
     upcoming_shows = app_helper.get_shows("future")
-    data = [
-        {
-            "city": venue.city,
-            "state": venue.state,
-            "venues": [
-                {
-                    "id": venue.id,
-                    "name": venue.name,
-                    "num_upcoming_shows": [show.venue_id for show in upcoming_shows].count(venue.id)
-                    # venues is a list of dicts that iterates over each venue in a city
-                } for venue in Venue.query.filter(Venue.city == venue.city)
-            ]
-        }
+    data = [{
+        "city": venue.city,
+        "state": venue.state,
+        "venues": [{
+            "id": venue.id,
+            "name": venue.name,
+            "num_upcoming_shows": [show.venue_id for show in upcoming_shows].count(venue.id)
+            # venues is a list of dicts that iterates over each venue in a city
+        } for venue in Venue.query.filter(Venue.city == venue.city)
+        ]
+    }
         # data is a list of dicts that iterates over every venue in every distinct city
         for venue in Venue.query.distinct(Venue.city).order_by(Venue.city).all()
     ]
@@ -109,11 +101,9 @@ def search_venues():
 
 @app.route("/venues/<int:venue_id>")
 def show_venue(venue_id):
-    # shows the venue page with the given venue_id
-    if not app_helper.validate_entity("venues", venue_id):
-        abort(404)
-
     venue = Venue.query.get(venue_id)
+    if not venue:
+        abort(404)
     past_venue_shows = app_helper.get_shows_for_venue(venue_id, "past")
     upcoming_venue_shows = app_helper.get_shows_for_venue(venue_id, "future")
 
@@ -131,25 +121,24 @@ def show_venue(venue_id):
         "start_time": str(show.start_time)
     } for show in upcoming_venue_shows]
 
-    print(past_shows, file=sys.stderr)
-    print(upcoming_shows, file=sys.stderr)
-    data = {"id": venue.id,
-            'name': venue.name,
-            'genres': venue.genres,
-            'address': venue.address,
-            'city': venue.city,
-            'state': venue.state,
-            'phone': venue.phone,
-            'website': venue.website,
-            'facebook_link': venue.facebook_link,
-            'seeking_talent': venue.seeking_talent,
-            'seeking_description': venue.seeking_description,
-            'image_link': venue.image_link,
-            'past_shows': past_shows,
-            'upcoming_shows': upcoming_shows,
-            "past_shows_count": len(past_shows),
-            "upcoming_shows_count": len(upcoming_shows),
-            }
+    data = {
+        "id": venue.id,
+        'name': venue.name,
+        'genres': venue.genres,
+        'address': venue.address,
+        'city': venue.city,
+        'state': venue.state,
+        'phone': venue.phone,
+        'website': venue.website,
+        'facebook_link': venue.facebook_link,
+        'seeking_talent': venue.seeking_talent,
+        'seeking_description': venue.seeking_description,
+        'image_link': venue.image_link,
+        'past_shows': past_shows,
+        'upcoming_shows': upcoming_shows,
+        "past_shows_count": len(past_shows),
+        "upcoming_shows_count": len(upcoming_shows),
+    }
 
     if request.headers.get("api"):
         return jsonify(data)
@@ -232,25 +221,25 @@ def show_artist(artist_id):
         "start_time": str(show.start_time),
     } for show in artist_upcoming_shows]
 
-    try:
-        artist = Artist.query.get(artist_id)
-        data = {"id": artist.id,
-                "name": artist.name,
-                "genres": artist.genres,
-                "city": artist.city,
-                "state": artist.state,
-                "phone": artist.phone,
-                "website": artist.website,
-                "facebook_link": artist.facebook_link,
-                "seeking_venue": artist.seeking_venue,
-                "seeking_description": artist.seeking_description,
-                "image_link": artist.image_link,
-                "past_shows": past_shows,
-                "upcoming_shows": upcoming_shows,
-                }
-        return render_template("pages/show_artist.html", artist=data)
-    except AttributeError as e:
-        return not_found_error(e)
+    artist = Artist.query.get(artist_id)
+    if not artist:
+        abort(404)
+    data = {
+        "id": artist.id,
+        "name": artist.name,
+        "genres": artist.genres,
+        "city": artist.city,
+        "state": artist.state,
+        "phone": artist.phone,
+        "website": artist.website,
+        "facebook_link": artist.facebook_link,
+        "seeking_venue": artist.seeking_venue,
+        "seeking_description": artist.seeking_description,
+        "image_link": artist.image_link,
+        "past_shows": past_shows,
+        "upcoming_shows": upcoming_shows,
+    }
+    return render_template("pages/show_artist.html", artist=data)
 
 
 # ----------------------------------------------------------------------------#
@@ -260,8 +249,7 @@ def show_artist(artist_id):
 def edit_artist(artist_id):
     form = ArtistForm()
     artist = Artist.query.get(artist_id)
-    data = {"id": artist.id,
-            "name": artist.name}
+    data = {"id": artist.id, "name": artist.name}
     return render_template("forms/edit_artist.html", form=form, artist=data)
 
 
@@ -276,18 +264,20 @@ def edit_artist_submission(artist_id):
 def edit_venue(venue_id):
     form = VenueForm()
     venue = Venue.query.get(venue_id)
-    data = {"id": venue.id,
-            "name": venue.name,
-            "genres": venue.genres,
-            "address": venue.address,
-            "city": venue.city,
-            "state": venue.state,
-            "phone": venue.phone,
-            "website": venue.website,
-            "facebook_link": venue.facebook_link,
-            "seeking_talent": venue.seeking_talent,
-            "seeking_description": venue.seeking_description,
-            "image_link": venue.image_link}
+    data = {
+        "id": venue.id,
+        "name": venue.name,
+        "genres": venue.genres,
+        "address": venue.address,
+        "city": venue.city,
+        "state": venue.state,
+        "phone": venue.phone,
+        "website": venue.website,
+        "facebook_link": venue.facebook_link,
+        "seeking_talent": venue.seeking_talent,
+        "seeking_description": venue.seeking_description,
+        "image_link": venue.image_link
+    }
     return render_template("forms/edit_venue.html", form=form, venue=data)
 
 
@@ -327,13 +317,13 @@ def create_artist_submission():
 @app.route("/shows")
 def shows():
     # displays list of shows at /shows
-    shows_data = [
-        {"venue_id": show.venue_id,
-         "venue_name": show.venues.name,
-         "artist_id": show.artists.id,
-         "artist_name": show.artists.name,
-         "artist_image_link": show.artists.image_link,
-         "start_time": str(show.start_time)}
+    shows_data = [{
+        "venue_id": show.venue_id,
+        "venue_name": show.venues.name,
+        "artist_id": show.artists.id,
+        "artist_name": show.artists.name,
+        "artist_image_link": show.artists.image_link,
+        "start_time": str(show.start_time)}
         for show in Show.query.all()
     ]
     return render_template("pages/shows.html", shows=shows_data)
