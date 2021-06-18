@@ -26,4 +26,6 @@ services:
       - "5432:5432"
     restart: unless-stopped
     volumes:
-      - ./sql:/tmp
+      - ./sql/venues.sql:/tmp/venues.sql
+      - ./sql/artists.sql:/tmp/artists.sql
+      - ./sql/artists.sql:/tmp/artists.sql
