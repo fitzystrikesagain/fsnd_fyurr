@@ -1,23 +1,19 @@
 # ----------------------------------------------------------------------------#
 # Imports
 # ----------------------------------------------------------------------------#
-import sys
-import time
-
 import dateutil.parser
 import logging
-from logging import Formatter, FileHandler
+from logging import FileHandler, Formatter
 import os
 
 from babel import dates
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort, Response
+from flask import Flask, abort, redirect, render_template, request, url_for
 from flask_migrate import Migrate
 from flask_moment import Moment
 
-from forms import ArtistForm, ShowForm, VenueForm
-
 from config import SQLALCHEMY_DATABASE_URI as DB_URI
-from models import db, Venue, Artist, Show
+from forms import ArtistForm, ShowForm, VenueForm
+from models import db, Artist, Show, Venue
 from utils.app_helper import AppHelper
 
 # ----------------------------------------------------------------------------#
@@ -79,8 +75,6 @@ def venues():
         # data is a list of dicts that iterates over every venue in every distinct city
         for venue in Venue.query.distinct(Venue.city).order_by(Venue.city).all()
     ]
-    if request.headers.get("api"):
-        return jsonify(data)
     return render_template("pages/venues.html", areas=data)
 
 
@@ -97,8 +91,6 @@ def search_venues():
             "num_upcoming_shows": len(app_helper.get_shows_for_venue(venue.id, "future"))
         } for venue in results]
     }
-    if request.headers.get("api"):
-        return jsonify(response)
     return render_template("pages/search_venues.html", results=response, search_term=pattern)
 
 
@@ -143,8 +135,6 @@ def show_venue(venue_id):
         "upcoming_shows_count": len(upcoming_shows),
     }
 
-    if request.headers.get("api"):
-        return jsonify(data)
     return render_template("pages/show_venue.html", venue=data)
 
 

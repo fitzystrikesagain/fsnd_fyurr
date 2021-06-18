@@ -31,7 +31,7 @@ class AppHelper:
         Returns a list of Show objects for a given Artist
         :param artist_id: the id of the artist
         :param interval: past, future, or all
-        :return:
+        :return: list of Show objects for `artist_id`
         """
         shows = filter(lambda x: x.artists.id == artist_id, self.get_shows(interval))
         return shows
@@ -41,7 +41,7 @@ class AppHelper:
         Returns a list of Show objects for a given venue
         :param venue_id: the id of the venue
         :param interval: past, future, or all
-        :return:
+        :return: list of Show objects for `venue_id`
         """
         shows = filter(lambda x: x.venues.id == venue_id, self.get_shows(interval))
         return list(shows)
@@ -52,7 +52,7 @@ class AppHelper:
         in valid_entities[entity]:
         :param entity: one of Artist, Show, Venue
         :param entity_id: the id of the entity, i.e. artist_id 1
-        :return: boolean
+        :return: boolean indicating whether the entity_id is valid, i.e. whether that id exists in that table
         """
         valid_entities = {
             "artists": [obj.id for obj in Artist.query.all()],
@@ -62,16 +62,30 @@ class AppHelper:
         return entity_id in valid_entities[entity]
 
     def max_value(self, db, entity):
+        """
+        Gets the max is for a given model/table. This is used as a sanity check to protect against integrity violations
+        on PK contraints. For example, if the database is seeded with the sql files in /sql, then subsequent insertions
+        will fail if we don't first check for extant rows.
+        :param db: sqlalchemy db object
+        :param entity: one of artists, shows, venues
+        :return: integer representing the max(id) in the given table
+        """
         max_values = {
             "artists": db.session.query(func.max(Artist.id)).scalar(),
             "shows": db.session.query(func.max(Show.id)).scalar(),
             "venues": db.session.query(func.max(Venue.id)).scalar()
         }
         return max_values[entity]
-        pass
 
     @staticmethod
     def search(entity, pattern):
+        """
+        Implements search functionality for artists and venues. This works by doing a select ilike(%pattern%) against
+        the given table. It returns a list of matching db.Model objects, which are parsed downstream
+        :param entity:
+        :param pattern:
+        :return: list of `entity` objects
+        """
         results = {
             "artists": Artist.query.filter(Artist.name.ilike(f"%{pattern}%")).all(),
             "venues": Venue.query.filter(Venue.name.ilike(f"%{pattern}%")).all(),

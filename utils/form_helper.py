@@ -1,7 +1,8 @@
 class FormHelper:
     """
-    states and genres used by forms.py
+    Basic helper class to handle the choices values for the Form object in forms.py
     """
+    # valid state choices for the dropdown
     states_list = [
         ('AL', 'AL'),
         ('AK', 'AK'),
@@ -56,6 +57,7 @@ class FormHelper:
         ('WY', 'WY'),
     ]
 
+    # Valid genre options for the SelectMultipleField
     genres_list = [
         ('Alternative', 'Alternative'),
         ('Blues', 'Blues'),

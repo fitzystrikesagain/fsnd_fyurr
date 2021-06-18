@@ -1,3 +1,8 @@
+"""
+This is the original mocked data that came with the project. The data is now seeded into the database by running
+the .sql files in /sql/ against Postgres, and this exists only for reference
+"""
+
 artists_data = [{
     "id": 4,
     "name": "Guns N Petals",
