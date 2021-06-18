@@ -176,7 +176,7 @@ def delete_venue(venue_id):
         db.session.rollback()
     finally:
         db.session.close()
-    return redirect(url_for("index", msg="Testing"))
+    return redirect(url_for("index"))
 
 
 # ----------------------------------------------------------------------------#

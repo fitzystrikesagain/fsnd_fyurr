@@ -90,26 +90,28 @@
         <button id="delete-venue" class="btn btn-primary btn-lg" style="background-color: #9e1515">Delete</button>
     </a>
 
-<script>
-    const deleteVenue = document.querySelector("#delete-venue");
-    const venueName = document.getElementById("venue-name").innerText
-    const venueId = window.location.pathname.split("/")[2]
-    deleteVenue.onclick = function (e) {
-        confirm('Are you sure you want to delete {{ venue.name }}?')
-        console.log("event", e);
-        fetch(`/venues/${venueId}`, {
-            method: "DELETE",
-            body: JSON.stringify({
-                "venue_id": parseInt(venueId)
-            }),
-            headers: {
-                "Content-Type": "application/JSON"
+    <script>
+        const deleteVenue = document.querySelector("#delete-venue");
+        const venueName = document.getElementById("venue-name").innerText
+        const venueId = window.location.pathname.split("/")[2]
+        deleteVenue.onclick = function (e) {
+            let deleteBool = confirm('Are you sure you want to delete {{ venue.name }}?')
+            console.log("event", e);
+            if (deleteBool === true) {
+                fetch(`/venues/${venueId}`, {
+                    method: "DELETE",
+                    body: JSON.stringify({
+                        "venue_id": parseInt(venueId)
+                    }),
+                    headers: {
+                        "Content-Type": "application/JSON"
+                    }
+                })
+                    .catch(function () {
+                            console.log("An error occurred")
+                        }
+                    )
             }
-        })
-            .catch(function () {
-                    console.log("An error occurred")
-                }
-            )
-    }
-</script>
+        }
+    </script>
 {% endblock %}
