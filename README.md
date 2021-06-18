@@ -123,6 +123,8 @@ docker exec -ti "$FLASK_CONTAINER_NAME" flask db upgrade
 docker exec -u root "$POSTGRES_CONTAINER_NAME" psql "$POSTGRES_DB" "$POSTGRES_USER" -f /tmp/venues.sql
 docker exec -u root "$POSTGRES_CONTAINER_NAME" psql "$POSTGRES_DB" "$POSTGRES_USER" -f /tmp/artists.sql
 docker exec -u root "$POSTGRES_CONTAINER_NAME" psql "$POSTGRES_DB" "$POSTGRES_USER" -f /tmp/shows.sql
+
+# Launch the website
 open http://localhost:"$FLASK_PORT"
 ```
 
