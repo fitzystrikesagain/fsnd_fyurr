@@ -26,9 +26,9 @@ done
 step "1" "End" "Waiting for $FLASK_CONTAINER_NAME to start"
 
 step "2" "Start" "Initializing database and performing migrations"
-docker exec -ti fyyur flask db init
-docker exec -ti fyyur flask db migrate
-docker exec -ti fyyur flask db upgrade
+docker exec -ti "$FLASK_CONTAINER_NAME" flask db init
+docker exec -ti "$FLASK_CONTAINER_NAME" flask db migrate
+docker exec -ti "$FLASK_CONTAINER_NAME" flask db upgrade
 step "2" "End" "Initializing database and performing migrations"
 
 step "3" "Start" "Loading tables with venues, artists, and shows data"
