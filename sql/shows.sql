@@ -1,3 +1,8 @@
+/*
+ Shows data from starter code. Used to seed the database
+ */
+
+
 begin;
 
 insert into shows (id,

@@ -1,3 +1,7 @@
+/*
+ Artists data from starter code. Used to seed the database
+ */
+
 insert into artists(id,
                     name,
                     genres,
