@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 
 from flask import request, flash
 from sqlalchemy import func
@@ -77,24 +78,30 @@ class AppHelper:
         }
         return results[entity]
 
-    def handle_submission(self, obj, operation):
+    def handle_submission(self, obj, operation="insert", entity_id=None):
         """
         Custom handler for submissions. Parses form data to either create new or update existing entities
         :param obj: an instance of either Artist, Show, or Venue
         :param operation: CRUD operation, either insert or update
+        :param entity_id: the id attribute of the Artist, Show, or Venue object
         :return: None
         """
         cls_name = obj.__class__.__name__
         entity = obj.__tablename__
+        verb = "updated" if operation == "update" else "listed"
         entity_form = {
             "artists": ArtistForm(request.form),
             "shows": ShowForm(request.form),
             "venues": VenueForm(request.form),
         }
         form = entity_form[entity]
+
+        # Catch and avoid integrity violations
         obj_max_id = self.max_value(db, entity)
         if obj_max_id:
             obj.id = obj_max_id + 1
+
+        # Define entity-specific data
         if entity == "artists":
             data = {
                 "name": form.name.data,
@@ -128,14 +135,21 @@ class AppHelper:
                 "seeking_description": form.seeking_description.data,
                 "image_link": form.image_link.data}
 
+        # For updates, set obj to the existing obj
+        if operation == "update":
+            old_obj = obj.__class__().query.get(entity_id)
+            obj = old_obj
+
+        # only update fields that weren't left blank on edit; for new subs this has no effect
         for key, value in data.items():
-            setattr(obj, key, value)
+            if value != "":
+                setattr(obj, key, value)
         try:
             db.session.add(obj)
             db.session.commit()
-            flash(f"{cls_name} was successfully listed!")
+            flash(f"{cls_name} was successfully {verb}!")
         except Exception as e:
-            flash(f"An error occurred. {cls_name} could not be listed.")
+            flash(f"An error occurred. {cls_name} could not be {verb}.")
             print(e, file=sys.stderr)
             db.session.rollback()
         finally:

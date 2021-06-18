@@ -258,8 +258,8 @@ def edit_artist(artist_id):
 
 @app.route("/artists/<int:artist_id>/edit", methods=["POST"])
 def edit_artist_submission(artist_id):
-    # TODO: [update] take values from the form submitted, and update existing artist record with ID <artist_id> using the new attributes
-
+    artist = Artist()
+    app_helper.handle_submission(artist, operation="update", entity_id=artist_id)
     return redirect(url_for("show_artist", artist_id=artist_id))
 
 
@@ -286,7 +286,8 @@ def edit_venue(venue_id):
 
 @app.route("/venues/<int:venue_id>/edit", methods=["POST"])
 def edit_venue_submission(venue_id):
-    # TODO: [update] take values from the form submitted, and update existing venue record with ID <venue_id> using the new attributes
+    venue = Venue()
+    app_helper.handle_submission(venue, operation="update", entity_id=venue_id)
     return redirect(url_for("show_venue", venue_id=venue_id))
 
 
