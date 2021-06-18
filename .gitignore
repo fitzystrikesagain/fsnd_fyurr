@@ -1,7 +1,3 @@
-# postgres mount and node modules
-data/
 node_modules/
-
-# Secrets, node files
 secrets.env
 package*.json

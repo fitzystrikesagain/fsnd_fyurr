@@ -12,18 +12,13 @@ Step ${1}/${NUM_STEPS} [${2}] -- ${3}
 EOF
 }
 
-# Tear down the container and remove db and migrations
-docker compose stop
-rm -rfv data/*
-rm -rfv migrations
-
 # Clean up all containers, fresh build
-docker container prune -f
-docker compose up -d
+
 
 # Wait for Flask, open website, exec into container
 source .env
 step "1" "Begin" "Waiting for $FLASK_CONTAINER_NAME to start"
+docker compose up -d
 while [[ "$(curl -s -o /dev/null -w "%{http_code}" localhost:"$FLASK_PORT")" != "200" ]]; do
   printf .
   sleep 1
