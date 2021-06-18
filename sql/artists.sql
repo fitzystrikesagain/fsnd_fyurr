@@ -1,6 +1,7 @@
 /*
  Artists data from starter code. Used to seed the database
  */
+begin;
 
 insert into artists(id,
                     name,
@@ -47,9 +48,4 @@ values (4,
         null,
         null);
 
-
-
-
-
-
-
+end;
