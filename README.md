@@ -10,6 +10,13 @@ artists as a venue owner.
 Your job is to build out the data models to power the API endpoints for the Fyyur site by connecting to a PostgreSQL
 database for storing, querying, and creating information about artists and venues on Fyyur.
 
+## Contents
+* [Requirements](#requirements)
+* [Project structure](#project-structure)
+* [Development Setup](#development-setup)
+    * [The Easy Way](#the-easy-way)
+    * [The Hands-on Way](#the-hands-on-way)
+
 ## Requirements
 
 This project was built for Docker and runs quite nicely there. As such, the dev setup instructions are written with
