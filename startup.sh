@@ -17,6 +17,7 @@ EOF
 
 # Wait for Flask, open website, exec into container
 source .env
+mkdir -p data
 step "1" "Begin" "Waiting for $FLASK_CONTAINER_NAME to start"
 docker compose up -d
 while [[ "$(curl -s -o /dev/null -w "%{http_code}" localhost:"$FLASK_PORT")" != "200" ]]; do
