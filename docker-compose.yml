@@ -28,4 +28,4 @@ services:
     volumes:
       - ./sql/venues.sql:/tmp/venues.sql
       - ./sql/artists.sql:/tmp/artists.sql
-      - ./sql/artists.sql:/tmp/artists.sql
+      - ./sql/shows.sql:/tmp/shows.sql
