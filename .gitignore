@@ -1,9 +1,7 @@
-# postgres mount, migrations and node modules
+# postgres mount and node modules
 data/
-migrations/
 node_modules/
 
-# Secrets, node files, and helper script
+# Secrets, node files
 secrets.env
 package*.json
-startup.sh
