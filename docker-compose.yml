@@ -27,5 +27,3 @@ services:
     restart: unless-stopped
     volumes:
       - ./sql:/tmp
-      - ./sql:/tmp
-      - ./sql:/tmp
