@@ -13,18 +13,35 @@ class AppHelper:
     Assorted helper methods for the Fyyur app
     """
 
-    def get_shows(self, interval="all"):
+    def get_shows(self, interval="all", entity="show", entity_id=None):
         """
-        Get a list of all Show objects
-        :param interval: (optional) get only past or future shows
+        Gets a list of all Show objects. Provided optional entity and entity_id parameters to optional return past or
+        future shows by either Venue or Artist
+        :param interval: (optional) get only past or future shows; default is all shows
+        :param entity: (optional) one of "venue" or "artist" (Note this is the singular case, whereas most other
+        references to these entities are pluralized. This is because a single artist or venue id is provided
+        :param entity_id: (optional)
         :return: list of Show objects
         """
-        all_shows = Show.query.all()
-        if interval == "past":
-            return filter(lambda x: x.start_time < datetime.now(), all_shows)
-        elif interval == "future":
-            return filter(lambda x: x.start_time > datetime.now(), all_shows)
-        return all_shows
+        all_shows = db.session.query(Show)
+
+        # Return all shows if either:
+        # 1. Interval is "all" or unspecified
+        # 2. Entity (venue/artist) is not provided
+        # 3. Entity id is not provided
+        if interval == "all" or entity in [None, "show"] or not entity_id:
+            return all_shows.all()
+
+        # Now that we only have past or future intervals, artist or show entities, and non-null entity_ids,
+        # entity_id. set a reusable expressions for filtering on the provided entity and interval
+        time_expr = Show.start_time < datetime.now() if interval == "past" else Show.start_time > datetime.now()
+        entity_filter = Show.artist_id if entity == "artist" else Show.venue_id
+
+        # This gives us a single query statement to manage:
+        return all_shows \
+            .join(Venue) \
+            .filter(entity_filter == entity_id) \
+            .filter(time_expr).all()
 
     def get_shows_for_artist(self, artist_id, interval="all"):
         """
@@ -33,8 +50,7 @@ class AppHelper:
         :param interval: past, future, or all
         :return: list of Show objects for `artist_id`
         """
-        shows = filter(lambda x: x.artists.id == artist_id, self.get_shows(interval))
-        return shows
+        return self.get_shows(interval=interval, entity="artist", entity_id=artist_id)
 
     def get_shows_for_venue(self, venue_id, interval="all"):
         """
@@ -43,8 +59,7 @@ class AppHelper:
         :param interval: past, future, or all
         :return: list of Show objects for `venue_id`
         """
-        shows = filter(lambda x: x.venues.id == venue_id, self.get_shows(interval))
-        return list(shows)
+        return self.get_shows(interval=interval, entity="venue", entity_id=venue_id)
 
     def validate_entity(self, entity, entity_id):
         """
